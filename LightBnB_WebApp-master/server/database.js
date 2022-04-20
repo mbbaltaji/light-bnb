@@ -1,18 +1,4 @@
-const properties = require('./json/properties.json');
-const users = require('./json/users.json');
-const { Pool } = require('pg');
-
-const pool = new Pool({
-  user: 'vagrant',
-  password: '123',
-  host: 'localhost',
-  database: 'lightbnb'
-});
-
-
-// the following assumes that you named your connection variable `pool`
-// pool.query(`SELECT title FROM properties LIMIT 10;`).then(response => {console.log(response)});
-
+const db = require('./db');
 /// Users
 
 /**
@@ -26,8 +12,7 @@ const getUserWithEmail = function(email) {
   FROM users 
   WHERE users.email = $1;  
   `;
-  return pool.  // returns a promise 
-  query(queryString, [email]).  //using parameterized query b/c data is coming from user 
+  return db.query(queryString, [email]).  //using parameterized query b/c data is coming from user 
   then((res) => {
     if (res.rows) {
     return res.rows[0];
@@ -53,8 +38,7 @@ const getUserWithId = function(id) {
   FROM users 
   WHERE users.id = $1
   `;
-  return pool.
-  query(queryString, [id])
+  return db.query(queryString, [id])
   .then((res) => {
     if (res.rows) {
       return res.rows[0];
@@ -82,8 +66,7 @@ const addUser =  function(user) {
   `;
   const values = [user.name, user.email, user.password];
 
-  return pool
-  .query(queryString,values)
+  return db.query(queryString,values)
   .then( (res) => {
     console.log(res.rows[0]);
     return res.rows;
@@ -119,8 +102,7 @@ const getAllReservations = function(guest_id, limit = 10) {
   `;
 
   const values = [guest_id, limit];
-  return pool
-  .query(queryString,values)
+  return db.query(queryString,values)
   .then((res) => { return res.rows; })
   .catch((err) => { 
     console.log(err.message);
@@ -194,7 +176,7 @@ const getAllProperties = (options, limit = 10) => {
   // 5: Console log everything just to make sure we've done it right.
   console.log(queryString, queryParams);
 
-  return pool.query(queryString, queryParams).then((res) => res.rows);
+  return db.query(queryString, queryParams).then((res) => res.rows);
 };
 exports.getAllProperties = getAllProperties;
 
@@ -242,8 +224,7 @@ const addProperty = function(property) {
     property.post_code
   ];
 
-  return pool
-  .query(queryString, queryParams)
+  return db.query(queryString, queryParams)
   .then( res => {
     return res.rows[0];
   })
