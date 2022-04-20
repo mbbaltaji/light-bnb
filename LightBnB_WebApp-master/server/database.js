@@ -9,10 +9,6 @@ const pool = new Pool({
   database: 'lightbnb'
 });
 
-// pool.connect()
-// .then( () => console.log("connected to db"))
-// .catch( e  => console.log(e.message))
-
 
 // the following assumes that you named your connection variable `pool`
 // pool.query(`SELECT title FROM properties LIMIT 10;`).then(response => {console.log(response)});
@@ -34,7 +30,6 @@ const getUserWithEmail = function(email) {
   query(queryString, [email]).  //using parameterized query b/c data is coming from user 
   then((res) => {
     if (res.rows) {
-      // console.log(res.rows[0]);
     return res.rows[0];
     } else {
       return null;
@@ -69,7 +64,7 @@ const getUserWithId = function(id) {
   })
   .catch( (err) => {
     console.log(err.message);
-  })
+  });
 }
 exports.getUserWithId = getUserWithId;
 
@@ -107,7 +102,29 @@ exports.addUser = addUser;
  * @return {Promise<[{}]>} A promise to the reservations.
  */
 const getAllReservations = function(guest_id, limit = 10) {
-  return getAllProperties(null, 2);
+  const queryString =`
+  SELECT 
+    properties.*, 
+    reservations.*, 
+    avg(property_reviews.rating) AS average_rating
+  FROM reservations
+  JOIN properties ON properties.id = reservations.property_id
+  JOIN property_reviews ON properties.id = property_reviews.property_id
+  WHERE 
+    reservations.guest_id = $1 AND
+    reservations.end_date < now()::date
+  GROUP BY properties.id, reservations.id
+  ORDER BY reservations.start_date
+  LIMIT $2;
+  `;
+
+  const values = [guest_id, limit];
+  return pool
+  .query(queryString,values)
+  .then((res) => { return res.rows; })
+  .catch((err) => { 
+    console.log(err.message);
+  });
 }
 exports.getAllReservations = getAllReservations;
 
@@ -119,13 +136,10 @@ exports.getAllReservations = getAllReservations;
  * @param {*} limit The number of results to return.
  * @return {Promise<[{}]>}  A promise to the properties.
  */
-const getAllProperties = (options, limit = 10) => {
+const getAllProperties = (limit = 10) => {
   return pool
     .query(`SELECT * FROM properties LIMIT $1;`, [limit])
-    .then((result) => {
-      console.log(result.rows);
-      return result.rows;
-    })
+    .then((res) => { return res.rows;})
     .catch((err) => {
       console.log(err.message);
     });
