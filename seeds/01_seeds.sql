@@ -12,13 +12,13 @@ VALUES('Speed lamp', 'description ','https://images.pexels.com/photos/2086676/pe
  46058 , 0, 5, 6, 'Canada', '651 Nami Road', 'Bohbatev', 'Alberta', 83680, TRUE);
 
 INSERT INTO reservations (start_date, end_date, property_id, guest_id)
-VALUES( '2018-09-11', '2018-09-11', 2, 3),
+VALUES( '2018-09-11', '2018-09-11', 2, 1),
 ( '2019-01-04', '2019-02-01', 2, 2),
-( '2014-10-01', '2021-10-14', 1, 4);
+( '2014-10-01', '2021-10-14', 1, 3);
 
 INSERT INTO property_reviews (guest_id, property_id, reservation_id, rating, message)
-VALUES(2, 5, 3, 3, 'messages'),
-(1, 4, 1, 4, 'messages'),
-(3, 1, 2, 6, 'messages');
+VALUES(2, 1, 3, 3, 'messages'),
+(1, 2, 1, 4, 'messages'),
+(3, 3, 2, 6, 'messages');
 
 
